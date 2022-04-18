@@ -103,7 +103,7 @@
 			}
 		}
 		# Linux
-		linux-g++ {
+		linux-g++ | linux-oe-g++ {
 	                    message("Compiling MbedTLS for Linux.")
 	                    # Look for CMake
 	                    CMAKE_BIN = $$system(which cmake)

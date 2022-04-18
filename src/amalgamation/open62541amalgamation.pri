@@ -20,10 +20,10 @@
 				MBEDTLS_FOLDER_LIBRARY = "-DMBEDTLS_FOLDER_LIBRARY=$${MBEDTLS_PATH}/build/library/Release"
 			}	
 		}
-		linux-g++ {
+		linux-g++ | linux-oe-g++ {
 			MBEDTLS_FOLDER_LIBRARY = "-DMBEDTLS_FOLDER_LIBRARY=$${MBEDTLS_PATH}/build/library"
 		}
-		UA_ENCRYPTION = "-DUA_ENABLE_ENCRYPTION_MBEDTLS=ON $${MBEDTLS_INCLUDE_DIRS} $${MBEDTLS_FOLDER_LIBRARY}"
+		UA_ENCRYPTION = "-DUA_ENABLE_ENCRYPTION_MBEDTLS=ON $${MBEDTLS_INCLUDE_DIRS} $${MBEDTLS_FOLDER_LIBRARY} -DMBEDTLS_LIBRARY=$${MBEDTLS_PATH}/build/library/libmbedtls.a -DMBEDX509_LIBRARY=$${MBEDTLS_PATH}/build/library/libmbedx509.a -DMBEDCRYPTO_LIBRARY=$${MBEDTLS_PATH}/build/library/libmbedcrypto.a"
 		message("Enabled ua_encryption (mbedtls).")
 	}
 	ua_events {
@@ -217,7 +217,7 @@
 		}
 	}
 	# Linux
-	linux-g++ {
+	linux-g++ | linux-oe-g++ {
 		message("Compiling Open62541 for Linux.")
 		# Look for CMake
 		CMAKE_BIN = $$system(which cmake)
