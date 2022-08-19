@@ -11,21 +11,19 @@
 /* OptionSet */
 static UA_DataTypeMember OptionSet_members[2] = {
 {
-	UA_TYPES_BYTESTRING, /* .memberTypeIndex */
+	UA_TYPENAME("Value") /* .memberName */
+	&UA_TYPES[UA_TYPES_BYTESTRING], /* .memberType */
 	0, /* .padding */
-	true, /* .namespaceZero */
 	false, /* .isArray */
 	false  /* .isOptional */
-	UA_TYPENAME("Value") /* .memberName */
 },
 {
-	UA_TYPES_BYTESTRING, /* .memberTypeIndex */
+	UA_TYPENAME("ValidBits") /* .memberName */
+	&UA_TYPES[UA_TYPES_BYTESTRING], /* .memberType */
 	offsetof(UA_OptionSet, validBits) - offsetof(UA_OptionSet, value) - sizeof(UA_ByteString), /* .padding */
-	true, /* .namespaceZero */
 	false, /* .isArray */
 	false  /* .isOptional */
-	UA_TYPENAME("ValidBits") /* .memberName */
-}, };
+} };
 
 QHash<UA_NodeId, UA_DataType*> mapOptionSetDatatypes;
 UA_DataType* getDataTypeFromNodeId(const UA_NodeId& optNodeId)
@@ -35,16 +33,15 @@ UA_DataType* getDataTypeFromNodeId(const UA_NodeId& optNodeId)
 		return mapOptionSetDatatypes[optNodeId];
 	}
 	UA_DataType* tmpType = new UA_DataType({
+		UA_TYPENAME("OptionSet") /* .typeName */
 		optNodeId, /* .typeId */
 		{0, UA_NODEIDTYPE_NUMERIC, {12765}}, /* .binaryEncodingId */
 		sizeof(UA_OptionSet), /* .memSize */
-		UA_TYPES_OPTIONSET, /* .typeIndex */
 		UA_DATATYPEKIND_STRUCTURE, /* .typeKind */
 		false, /* .pointerFree */
 		false, /* .overlayable */
 		2, /* .membersSize */
 		OptionSet_members  /* .members */
-		UA_TYPENAME("OptionSet") /* .typeName */
 	});
 	mapOptionSetDatatypes[optNodeId] = tmpType;
 	return tmpType;

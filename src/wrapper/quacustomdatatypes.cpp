@@ -210,10 +210,11 @@ QMetaType::Type QUaDataType::qTypeByNodeId(const UA_NodeId& nodeId)
 	return m_custTypesByNodeId.value(nodeId, QMetaType::UnknownType);
 }
 
-QMetaType::Type QUaDataType::qTypeByTypeIndex(const int& typeIndex)
+QMetaType::Type QUaDataType::qTypeByTypeName(const char *typeName)
 {
-	Q_ASSERT(m_custTypesByTypeIndex.contains(typeIndex));
-	return m_custTypesByTypeIndex.value(typeIndex, QMetaType::UnknownType);
+	QString strType = typeName;
+	Q_ASSERT(m_custTypesByName.contains(strType));
+	return m_custTypesByName.value(strType, QMetaType::UnknownType);
 }
 
 UA_NodeId QUaDataType::nodeIdByQType(const QMetaType::Type& type)

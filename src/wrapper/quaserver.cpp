@@ -598,7 +598,7 @@ extern "C" {
 		const UA_Byte **bufEnd);
 
 	UA_EXPORT extern UA_StatusCode
-		UA_encodeBinary(const void *src, const UA_DataType *type,
+		UA_encodeBinaryInternal(const void *src, const UA_DataType *type,
 			UA_Byte **bufPos, const UA_Byte **bufEnd,
 			UA_exchangeEncodeBuffer exchangeCallback,
 			void *exchangeHandle) UA_FUNC_ATTR_WARN_UNUSED_RESULT;

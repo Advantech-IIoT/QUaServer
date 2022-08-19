@@ -367,7 +367,7 @@ public:
 
     static bool               isSupportedQType(const QMetaType::Type& type);
     static QMetaType::Type    qTypeByNodeId   (const UA_NodeId &nodeId);
-    static QMetaType::Type    qTypeByTypeIndex(const int& typeIndex);
+    static QMetaType::Type    qTypeByTypeName (const char *typeName);
     static UA_NodeId          nodeIdByQType   (const QMetaType::Type& type);
     static const UA_DataType* dataTypeByQType (const QMetaType::Type& type);
     static QString            stringByQType   (const QMetaType::Type& type);

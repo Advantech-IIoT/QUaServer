@@ -606,7 +606,7 @@ QMetaType::Type uaTypeToQType(const UA_DataType * uaType)
 	if (uaType == nullptr) {
 		return QMetaType::UnknownType;
 	}
-	return QUaDataType::qTypeByTypeIndex(uaType->typeIndex);
+	return QUaDataType::qTypeByTypeName(uaType->typeName);
 }
 
 QVariant uaVariantToQVariant(const UA_Variant & uaVariant, const ArrayType& arrType /*= ArrayType::QList*/)
@@ -622,67 +622,63 @@ QVariant uaVariantToQVariant(const UA_Variant & uaVariant, const ArrayType& arrT
 		return uaVariantToQVariantArray(uaVariant, arrType);
 	}
 	// handle scalar
-	auto index = uaVariant.type->typeIndex;
-	switch (index) {
-	case UA_TYPES_VARIANT:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_VARIANT])
 		return uaVariantToQVariantScalar<QVariant   , UA_Variant   >(uaVariant, QMetaType::UnknownType);
-	case UA_TYPES_BOOLEAN:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_BOOLEAN])
 		return uaVariantToQVariantScalar<bool       , UA_Boolean   >(uaVariant, QMetaType::Bool);
-	case UA_TYPES_SBYTE:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_SBYTE])
 		return uaVariantToQVariantScalar<signed char, UA_SByte     >(uaVariant, QMetaType::SChar);
-	case UA_TYPES_BYTE:											   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_BYTE])
 		return uaVariantToQVariantScalar<uchar      , UA_Byte      >(uaVariant, QMetaType::UChar);
-	case UA_TYPES_INT16:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_INT16])
 		return uaVariantToQVariantScalar<qint16     , UA_Int16     >(uaVariant, QMetaType::Short);
-	case UA_TYPES_UINT16:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UINT16])
 		return uaVariantToQVariantScalar<quint16    , UA_UInt16    >(uaVariant, QMetaType::UShort);
-	case UA_TYPES_INT32:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_INT32])
 		return uaVariantToQVariantScalar<qint32     , UA_Int32     >(uaVariant, QMetaType::Int);
-	case UA_TYPES_UINT32:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UINT32])
 		return uaVariantToQVariantScalar<quint32    , UA_UInt32    >(uaVariant, QMetaType::UInt);
-	case UA_TYPES_INT64:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_INT64])
 		return uaVariantToQVariantScalar<int64_t    , UA_Int64     >(uaVariant, QMetaType::LongLong);
-	case UA_TYPES_UINT64:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UINT64])
 		return uaVariantToQVariantScalar<uint64_t   , UA_UInt64    >(uaVariant, QMetaType::ULongLong);
-	case UA_TYPES_FLOAT:										   
-		return uaVariantToQVariantScalar<float      , UA_Float     >(uaVariant, QMetaType::Float);
-	case UA_TYPES_DOUBLE:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_FLOAT])
+		return uaVariantToQVariantScalar<float      , UA_Float     >(uaVariant, QMetaType::Float);	
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_DOUBLE])
 		return uaVariantToQVariantScalar<double     , UA_Double    >(uaVariant, QMetaType::Double);
-	case UA_TYPES_STRING:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_STRING])
 		return uaVariantToQVariantScalar<QString    , UA_String    >(uaVariant, QMetaType::QString);
-	case UA_TYPES_DATETIME:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_DATETIME])
 		return uaVariantToQVariantScalar<QDateTime  , UA_DateTime  >(uaVariant, QMetaType::QDateTime);
-	case UA_TYPES_GUID:											   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_GUID])
 		return uaVariantToQVariantScalar<QUuid      , UA_Guid      >(uaVariant, QMetaType::QUuid);
-	case UA_TYPES_BYTESTRING:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_BYTESTRING])
 		return uaVariantToQVariantScalar<QByteArray , UA_ByteString>(uaVariant, QMetaType::QByteArray);
-	case UA_TYPES_UTCTIME:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UTCTIME])
 		// NOTE : typedef UA_DateTime UA_UtcTime;
 		return uaVariantToQVariantScalar<QDateTime  , UA_DateTime  >(uaVariant, QMetaType::QDateTime);
-	default:
 	{
-		if(index == UA_TYPES_NODEID)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_NODEID])
 			return uaVariantToQVariantScalar<QUaNodeId, UA_NodeId>(uaVariant, QMetaType_NodeId);
-		if(index == UA_TYPES_STATUSCODE)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_STATUSCODE])
 			return uaVariantToQVariantScalar<quint32, UA_StatusCode>(uaVariant, QMetaType_StatusCode);
-		if(index == UA_TYPES_QUALIFIEDNAME)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_QUALIFIEDNAME])
 			return uaVariantToQVariantScalar<QUaQualifiedName, UA_QualifiedName>(uaVariant, QMetaType_QualifiedName);
-		if(index == UA_TYPES_LOCALIZEDTEXT)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_LOCALIZEDTEXT])
 			return uaVariantToQVariantScalar<QUaLocalizedText, UA_LocalizedText   >(uaVariant, QMetaType_LocalizedText);
 #ifdef UA_GENERATED_NAMESPACE_ZERO_FULL
-		if (index == UA_TYPES_IMAGEPNG)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_IMAGEPNG])
 			return uaVariantToQVariantScalar<QByteArray, UA_ImagePNG>(uaVariant, QMetaType_Image);
-		if (index == UA_TYPES_OPTIONSET)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_OPTIONSET])
 			return uaVariantToQVariantScalar<QUaOptionSet, UA_OptionSet>(uaVariant, QMetaType_OptionSet);
 #endif // UA_GENERATED_NAMESPACE_ZERO_FULL
 #ifdef UA_ENABLE_SUBSCRIPTIONS_EVENTS
-		if(index == UA_TYPES_TIMEZONEDATATYPE)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_TIMEZONEDATATYPE])
 			return uaVariantToQVariantScalar<QTimeZone, UA_TimeZoneDataType>(uaVariant, QMetaType_TimeZone);
-		if(index == UA_TYPES_MODELCHANGESTRUCTUREDATATYPE)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_MODELCHANGESTRUCTUREDATATYPE])
 			return uaVariantToQVariantScalar<QUaChangeStructureDataType, UA_ModelChangeStructureDataType>(uaVariant, QMetaType_ChangeStructureDataType);
 #endif // UA_ENABLE_SUBSCRIPTIONS_EVENTS
 			Q_ASSERT_X(false, "uaVariantToQVariant", "Unsupported datatype");
-		}
 	}
 	return QVariant();
 }
@@ -708,64 +704,60 @@ QVariant uaVariantToQVariantList(const UA_Variant & uaVariant)
 		return QVariant();
 	}
 	// handle array
-	auto index = uaVariant.type->typeIndex;
-	switch (index) {
-	case UA_TYPES_VARIANT:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_VARIANT])
         return uaVariantToQVariantArray<QList<QVariant>   , UA_Variant   >(uaVariant, QMetaType::UnknownType);
-	case UA_TYPES_BOOLEAN:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_BOOLEAN])
         return uaVariantToQVariantArray<QList<bool>       , UA_Boolean   >(uaVariant, QMetaType::Bool);
-	case UA_TYPES_SBYTE:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_SBYTE])
         return uaVariantToQVariantArray<QList<signed char>, UA_SByte     >(uaVariant, QMetaType::SChar);
-	case UA_TYPES_BYTE:											   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_BYTE])
         return uaVariantToQVariantArray<QList<uchar>      , UA_Byte      >(uaVariant, QMetaType::UChar);
-	case UA_TYPES_INT16:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_INT16])
         return uaVariantToQVariantArray<QList<qint16>     , UA_Int16     >(uaVariant, QMetaType::Short);
-	case UA_TYPES_UINT16:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UINT16])
         return uaVariantToQVariantArray<QList<quint16>    , UA_UInt16    >(uaVariant, QMetaType::UShort);
-	case UA_TYPES_INT32:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_INT32])
         return uaVariantToQVariantArray<QList<qint32>     , UA_Int32     >(uaVariant, QMetaType::Int);
-	case UA_TYPES_UINT32:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UINT32])
         return uaVariantToQVariantArray<QList<quint32>    , UA_UInt32    >(uaVariant, QMetaType::UInt);
-	case UA_TYPES_INT64:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_INT64])
         return uaVariantToQVariantArray<QList<int64_t>    , UA_Int64     >(uaVariant, QMetaType::LongLong);
-	case UA_TYPES_UINT64:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UINT64])
         return uaVariantToQVariantArray<QList<uint64_t>   , UA_UInt64    >(uaVariant, QMetaType::ULongLong);
-	case UA_TYPES_FLOAT:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_FLOAT])
         return uaVariantToQVariantArray<QList<float>      , UA_Float     >(uaVariant, QMetaType::Float);
-	case UA_TYPES_DOUBLE:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_DOUBLE])
         return uaVariantToQVariantArray<QList<double>     , UA_Double    >(uaVariant, QMetaType::Double);
-	case UA_TYPES_STRING:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_STRING])
         return uaVariantToQVariantArray<QList<QString>    , UA_String    >(uaVariant, QMetaType::QString);
-	case UA_TYPES_DATETIME:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_DATETIME])   
         return uaVariantToQVariantArray<QList<QDateTime>  , UA_DateTime  >(uaVariant, QMetaType::QDateTime);
-	case UA_TYPES_GUID:											   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_GUID])
         return uaVariantToQVariantArray<QList<QUuid>      , UA_Guid      >(uaVariant, QMetaType::QUuid);
-	case UA_TYPES_BYTESTRING:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_BYTESTRING])
         return uaVariantToQVariantArray<QList<QByteArray> , UA_ByteString>(uaVariant, QMetaType::QByteArray);
-	default:
-		{
-		if(index == UA_TYPES_NODEID)
+	{
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_NODEID])
 			return uaVariantToQVariantArray<QList<QUaNodeId>, UA_NodeId>(uaVariant, QMetaType_NodeId);
-		if (index == UA_TYPES_STATUSCODE)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_STATUSCODE])
 			return uaVariantToQVariantArray<QList<QUaStatusCode>, UA_StatusCode>(uaVariant, QMetaType_StatusCode);
-		if (index == UA_TYPES_QUALIFIEDNAME)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_QUALIFIEDNAME])
 			return uaVariantToQVariantArray<QList<QUaQualifiedName>, UA_QualifiedName>(uaVariant, QMetaType_QualifiedName);
-		if (index == UA_TYPES_LOCALIZEDTEXT)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_LOCALIZEDTEXT])
 			return uaVariantToQVariantArray<QList<QUaLocalizedText>, UA_LocalizedText>(uaVariant, QMetaType_LocalizedText);
 #ifdef UA_GENERATED_NAMESPACE_ZERO_FULL
-		if (index == UA_TYPES_IMAGEPNG)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_IMAGEPNG])
 			return uaVariantToQVariantArray<QList<QByteArray>, UA_ImagePNG>(uaVariant, QMetaType_Image);
-		if (index == UA_TYPES_OPTIONSET)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_OPTIONSET])
 			return uaVariantToQVariantArray<QList<QUaOptionSet>, UA_OptionSet>(uaVariant, QMetaType_OptionSet);
 #endif // UA_GENERATED_NAMESPACE_ZERO_FULL
 #ifdef UA_ENABLE_SUBSCRIPTIONS_EVENTS
-		if (index == UA_TYPES_TIMEZONEDATATYPE)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_TIMEZONEDATATYPE])
 			return uaVariantToQVariantArray<QList<QTimeZone>, UA_TimeZoneDataType>(uaVariant, QMetaType_TimeZone);
-		if (index == UA_TYPES_MODELCHANGESTRUCTUREDATATYPE)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_MODELCHANGESTRUCTUREDATATYPE])
 			return uaVariantToQVariantArray<QList<QUaChangeStructureDataType>, UA_ModelChangeStructureDataType>(uaVariant, QMetaType_ChangeStructureDataType);
 #endif // UA_ENABLE_SUBSCRIPTIONS_EVENTS
 			Q_ASSERT_X(false, "uaVariantToQVariantArray", "Unsupported datatype");
-		}
 	}
 	return QVariant();
 }
@@ -777,64 +769,60 @@ QVariant uaVariantToQVariantVector(const UA_Variant & uaVariant)
 		return QVariant();
 	}
 	// handle array
-	auto index = uaVariant.type->typeIndex;
-	switch (index) {
-	case UA_TYPES_VARIANT:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_VARIANT])
         return uaVariantToQVariantArray<QVector<QVariant>   , UA_Variant   >(uaVariant, QMetaType::UnknownType);
-	case UA_TYPES_BOOLEAN:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_BOOLEAN])
         return uaVariantToQVariantArray<QVector<bool>       , UA_Boolean   >(uaVariant, QMetaType::Bool);
-	case UA_TYPES_SBYTE:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_SBYTE])
         return uaVariantToQVariantArray<QVector<signed char>, UA_SByte     >(uaVariant, QMetaType::SChar);
-	case UA_TYPES_BYTE:											   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_BYTE])
         return uaVariantToQVariantArray<QVector<uchar>      , UA_Byte      >(uaVariant, QMetaType::UChar);
-	case UA_TYPES_INT16:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_INT16])
         return uaVariantToQVariantArray<QVector<qint16>     , UA_Int16     >(uaVariant, QMetaType::Short);
-	case UA_TYPES_UINT16:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UINT16])
         return uaVariantToQVariantArray<QVector<quint16>    , UA_UInt16    >(uaVariant, QMetaType::UShort);
-	case UA_TYPES_INT32:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_INT32])
         return uaVariantToQVariantArray<QVector<qint32>     , UA_Int32     >(uaVariant, QMetaType::Int);
-	case UA_TYPES_UINT32:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UINT32])
         return uaVariantToQVariantArray<QVector<quint32>    , UA_UInt32    >(uaVariant, QMetaType::UInt);
-	case UA_TYPES_INT64:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_INT64])
         return uaVariantToQVariantArray<QVector<int64_t>    , UA_Int64     >(uaVariant, QMetaType::LongLong);
-	case UA_TYPES_UINT64:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_UINT64])
         return uaVariantToQVariantArray<QVector<uint64_t>   , UA_UInt64    >(uaVariant, QMetaType::ULongLong);
-	case UA_TYPES_FLOAT:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_FLOAT])
         return uaVariantToQVariantArray<QVector<float>      , UA_Float     >(uaVariant, QMetaType::Float);
-	case UA_TYPES_DOUBLE:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_DOUBLE])
         return uaVariantToQVariantArray<QVector<double>     , UA_Double    >(uaVariant, QMetaType::Double);
-	case UA_TYPES_STRING:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_STRING])
         return uaVariantToQVariantArray<QVector<QString>    , UA_String    >(uaVariant, QMetaType::QString);
-	case UA_TYPES_DATETIME:										   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_DATETIME])
         return uaVariantToQVariantArray<QVector<QDateTime>  , UA_DateTime  >(uaVariant, QMetaType::QDateTime);
-	case UA_TYPES_GUID:											   
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_GUID])
         return uaVariantToQVariantArray<QVector<QUuid>      , UA_Guid      >(uaVariant, QMetaType::QUuid);
-	case UA_TYPES_BYTESTRING:
+	if (uaVariant.type == &UA_TYPES[UA_TYPES_BYTESTRING])
         return uaVariantToQVariantArray<QVector<QByteArray> , UA_ByteString>(uaVariant, QMetaType::QByteArray);
-	default:
-		{
-		if(index == UA_TYPES_NODEID)
+	{
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_NODEID])
 			return uaVariantToQVariantArray<QVector<QUaNodeId>, UA_NodeId>(uaVariant, QMetaType_NodeId);
-		if (index == UA_TYPES_STATUSCODE)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_STATUSCODE])
 			return uaVariantToQVariantArray<QVector<QUaStatusCode>, UA_StatusCode>(uaVariant, QMetaType_StatusCode);
-		if (index == UA_TYPES_QUALIFIEDNAME)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_QUALIFIEDNAME])
 			return uaVariantToQVariantArray<QVector<QUaQualifiedName>, UA_QualifiedName>(uaVariant, QMetaType_QualifiedName);
-		if (index == UA_TYPES_LOCALIZEDTEXT)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_LOCALIZEDTEXT])
 			return uaVariantToQVariantArray<QVector<QUaLocalizedText>, UA_LocalizedText>(uaVariant, QMetaType_LocalizedText);
 #ifdef UA_GENERATED_NAMESPACE_ZERO_FULL
-		if (index == UA_TYPES_IMAGEPNG)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_IMAGEPNG])
 			return uaVariantToQVariantArray<QVector<QByteArray>, UA_ImagePNG>(uaVariant, QMetaType_Image);
-		if (index == UA_TYPES_OPTIONSET)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_OPTIONSET])
 			return uaVariantToQVariantArray<QVector<QUaOptionSet>, UA_OptionSet>(uaVariant, QMetaType_OptionSet);
 #endif // UA_GENERATED_NAMESPACE_ZERO_FULL
 #ifdef UA_ENABLE_SUBSCRIPTIONS_EVENTS
-		if (index == UA_TYPES_TIMEZONEDATATYPE)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_TIMEZONEDATATYPE])
 			return uaVariantToQVariantArray<QVector<QTimeZone>, UA_TimeZoneDataType>(uaVariant, QMetaType_TimeZone);
-		if (index == UA_TYPES_MODELCHANGESTRUCTUREDATATYPE)
+		if (uaVariant.type == &UA_TYPES[UA_TYPES_MODELCHANGESTRUCTUREDATATYPE])
 			return uaVariantToQVariantArray<QVector<QUaChangeStructureDataType>, UA_ModelChangeStructureDataType>(uaVariant, QMetaType_ChangeStructureDataType);
 #endif // UA_ENABLE_SUBSCRIPTIONS_EVENTS
 			Q_ASSERT_X(false, "uaVariantToQVariantVector", "Unsupported datatype");
-		}
 	}
 	return QVariant();
 }
