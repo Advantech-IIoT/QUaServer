@@ -8,23 +8,8 @@
 		message("Enabled ua_namespace_full.")
 	}
 	ua_encryption {
-		# build encryption mbedtls dependency
-		include($$PWD/open62541encryption.pri)
-		# configure open62541 to use mbedtls
-		MBEDTLS_PATH = $$PWD/../../depends/mbedtls.git
-		MBEDTLS_INCLUDE_DIRS = "-DMBEDTLS_INCLUDE_DIRS=$${MBEDTLS_PATH}/include"
-		win32 {
-			CONFIG(debug, debug|release) {
-				MBEDTLS_FOLDER_LIBRARY = "-DMBEDTLS_FOLDER_LIBRARY=$${MBEDTLS_PATH}/build/library/Debug"
-			} else {
-				MBEDTLS_FOLDER_LIBRARY = "-DMBEDTLS_FOLDER_LIBRARY=$${MBEDTLS_PATH}/build/library/Release"
-			}	
-		}
-		linux-g++ | linux-oe-g++ {
-			MBEDTLS_FOLDER_LIBRARY = "-DMBEDTLS_FOLDER_LIBRARY=$${MBEDTLS_PATH}/build/library"
-		}
-		UA_ENCRYPTION = "-DUA_ENABLE_ENCRYPTION_MBEDTLS=ON $${MBEDTLS_INCLUDE_DIRS} $${MBEDTLS_FOLDER_LIBRARY} -DMBEDTLS_LIBRARY=$${MBEDTLS_PATH}/build/library/libmbedtls.a -DMBEDX509_LIBRARY=$${MBEDTLS_PATH}/build/library/libmbedx509.a -DMBEDCRYPTO_LIBRARY=$${MBEDTLS_PATH}/build/library/libmbedcrypto.a"
-		message("Enabled ua_encryption (mbedtls).")
+		UA_ENCRYPTION = "-DUA_ENABLE_ENCRYPTION=OPENSSL"
+		message("Enabled ua_encryption (openssl).")
 	}
 	ua_events {
 		UA_NAMESPACE = "-DUA_NAMESPACE_ZERO=FULL"
