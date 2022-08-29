@@ -752,7 +752,8 @@ inline T * QUaServer::createInstance(
 	Q_CHECK_PTR(newInstance);
     Q_ASSERT(newInstance->parent() == parentNode);
 	// return c++ instance
-	UA_NodeId_clear(&newInstanceNodeId);
+    // should not clear node id at here, do clear at destructor
+	//UA_NodeId_clear(&newInstanceNodeId);
 	return newInstance;
 }
 
