@@ -25,7 +25,5 @@ HEADERS += $$PWD/open62541.h
 SOURCES += $$PWD/open62541.c
 
 ua_encryption {
-	MBEDTLS_PATH = $$PWD/../../depends/mbedtls.git
-	INCLUDEPATH += $$MBEDTLS_PATH/build/include
     DEFINES += UA_ENABLE_ENCRYPTION
 }

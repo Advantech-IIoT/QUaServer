@@ -20,7 +20,7 @@ build-image:
 
 build: build-image generate-makefile
 	@echo "build in docker"
-	docker run --rm --platform linux/arm64 -v $(SRC_PATH):/src $(DOCKER_TAG_NAME) make linux-build
+	docker run --rm --platform linux/arm64 -v $(SRC_PATH):/src $(DOCKER_TAG_NAME) make -f Makefile.local linux-build
 
 linux-build: clean
 	@echo "make start"
@@ -36,7 +36,7 @@ linux-generate-makefile:
 
 generate-makefile:
 	@echo "generate makefile in docker"
-	docker run --rm --platform linux/arm64 -v $(SRC_PATH):/src $(DOCKER_TAG_NAME) make linux-generate-makefile
+	docker run --rm --platform linux/arm64 -v $(SRC_PATH):/src $(DOCKER_TAG_NAME) make -f Makefile.local linux-generate-makefile
 
 clean:
 	rm -f _obj/*.o
