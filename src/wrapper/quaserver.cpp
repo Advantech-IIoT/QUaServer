@@ -515,7 +515,7 @@ void QUaServer::bindMethod(
 	const int       &metaMethodIndex)
 {
 	// register callback in open62541
-	auto st = UA_Server_setMethodNode_callback(server->m_server, *methodNodeId, &QUaServer::methodCallback);
+	auto st = UA_Server_setMethodNodeCallback(server->m_server, *methodNodeId, &QUaServer::methodCallback);
 	Q_ASSERT(st == UA_STATUSCODE_GOOD);
 	// set QUaServer* instance as method context
 	st = UA_Server_setNodeContext(
@@ -859,8 +859,8 @@ UA_UInt32 QUaServer::getUserRightsMask(UA_Server        *server,
 	{
 		// TODO : wait until officially supported
 		// https://github.com/open62541/open62541/issues/2617
-		//auto st = UA_Server_closeSession(server, sessionId);
-		//Q_ASSERT(st == UA_STATUSCODE_GOOD);
+		auto st = UA_Server_closeSession(server, sessionId);
+		Q_ASSERT(st == UA_STATUSCODE_GOOD);
 		return (UA_UInt32)0;
 	}
 	// if node from user tree then call user implementation
@@ -893,8 +893,8 @@ UA_Byte QUaServer::getUserAccessLevel(UA_Server        *server,
 	{
 		// TODO : wait until officially supported
 		// https://github.com/open62541/open62541/issues/2617
-		//auto st = UA_Server_closeSession(server, sessionId);
-		//Q_ASSERT(st == UA_STATUSCODE_GOOD);
+		auto st = UA_Server_closeSession(server, sessionId);
+		Q_ASSERT(st == UA_STATUSCODE_GOOD);
 		return (UA_UInt32)0;
 	}
 	// if node from user tree then call user implementation
@@ -932,8 +932,8 @@ UA_Boolean QUaServer::getUserExecutable(UA_Server        *server,
 	{
 		// TODO : wait until officially supported
 		// https://github.com/open62541/open62541/issues/2617
-		//auto st = UA_Server_closeSession(server, sessionId);
-		//Q_ASSERT(st == UA_STATUSCODE_GOOD);
+		auto st = UA_Server_closeSession(server, sessionId);
+		Q_ASSERT(st == UA_STATUSCODE_GOOD);
 		return false;
 	}
 	return true;
@@ -964,8 +964,8 @@ UA_Boolean QUaServer::getUserExecutableOnObject(UA_Server        *server,
 	{
 		// TODO : wait until officially supported
 		// https://github.com/open62541/open62541/issues/2617
-		//auto st = UA_Server_closeSession(server, sessionId);
-		//Q_ASSERT(st == UA_STATUSCODE_GOOD);
+		auto st = UA_Server_closeSession(server, sessionId);
+		Q_ASSERT(st == UA_STATUSCODE_GOOD);
 		return false;
 	}
 	// if node from user tree then call user implementation
@@ -1304,13 +1304,13 @@ void QUaServer::setupServer()
 	this->registerSpecificationType<QUaTransitionEvent           >(UA_NODEID_NUMERIC(0, UA_NS0ID_TRANSITIONEVENTTYPE     ));
 	// register static condition refresh methods
 	// Part 9 - 5.57 and 5.5.8
-	st = UA_Server_setMethodNode_callback(
+	st = UA_Server_setMethodNodeCallback(
 		m_server, 
 		UA_NODEID_NUMERIC(0, UA_NS0ID_CONDITIONTYPE_CONDITIONREFRESH), 
 		&QUaCondition::ConditionRefresh
 	);
 	Q_ASSERT(st == UA_STATUSCODE_GOOD);
-	st = UA_Server_setMethodNode_callback(
+	st = UA_Server_setMethodNodeCallback(
 		m_server,
 		UA_NODEID_NUMERIC(0, UA_NS0ID_CONDITIONTYPE_CONDITIONREFRESH2),
 		&QUaCondition::ConditionRefresh2
