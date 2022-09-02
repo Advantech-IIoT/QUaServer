@@ -117,41 +117,45 @@ void QUaServer::uaDestructor(UA_Server       * server,
 	auto st = UA_Server_getNodeContext(server, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER), &serverContext);
 	Q_ASSERT(st == UA_STATUSCODE_GOOD);
 	Q_UNUSED(st);
+	if (serverContext != nullptr) {
 #ifdef QT_DEBUG 
-	auto srv = qobject_cast<QUaServer*>(static_cast<QObject*>(serverContext));
-	Q_CHECK_PTR(srv);
+		auto srv = qobject_cast<QUaServer*>(static_cast<QObject*>(serverContext));
+		Q_CHECK_PTR(srv);
 #else
-	auto srv = static_cast<QUaServer*>(serverContext);
+		auto srv = static_cast<QUaServer*>(serverContext);
 #endif // QT_DEBUG 
 	// check session (objects can be created or destroyed without client connected)
 	//Q_ASSERT(srv->m_hashSessions.contains(*sessionId));
-	srv->m_currentSession = srv->m_hashSessions.contains(*sessionId) ?
-		srv->m_hashSessions[*sessionId] : nullptr;
+		srv->m_currentSession = srv->m_hashSessions.contains(*sessionId) ?
+			srv->m_hashSessions[*sessionId] : nullptr;
+	}
 	// get node
-	void * context;
+	void * context = nullptr;
 	st = UA_Server_getNodeContext(server, *nodeId, &context);
 	Q_ASSERT(st == UA_STATUSCODE_GOOD);
 	// try to convert to node (NOTE : nullptr is triggered by ~QUaNode)
+	if (context != nullptr) {
 #ifdef QT_DEBUG 
-	auto node = qobject_cast<QUaNode*>(static_cast<QObject*>(context));
+		auto node = qobject_cast<QUaNode*>(static_cast<QObject*>(context));
 #else
-	auto node = static_cast<QUaNode*>(context);
+		auto node = static_cast<QUaNode*>(context);
 #endif // QT_DEBUG 
-	// early exit if not convertible (this call was triggered by ~QUaNode)
-	if (!node)
-	{
-		return;
-	}
-	// handle events if enabled
+		// early exit if not convertible (this call was triggered by ~QUaNode)
+		if (!node)
+		{
+			return;
+		}
+		// handle events if enabled
 #ifdef UA_ENABLE_SUBSCRIPTIONS_EVENTS
-	// check if event (not in tree)
-	auto evt = qobject_cast<QUaBaseEvent*>(node);
-	if (evt)
-	{
-		evt->deleteLater();
-		return;
-	}
+		// check if event (not in tree)
+		auto evt = qobject_cast<QUaBaseEvent*>(node);
+		if (evt)
+		{
+			evt->deleteLater();
+			return;
+		}
 #endif // UA_ENABLE_SUBSCRIPTIONS_EVENTS
+	}
 	// if convertible could mean:
 	// 1) this is a child of a node being deleted programatically 
 	//    this one does not require to call C++ delete because Qt will take care of it
@@ -161,7 +165,7 @@ void QUaServer::uaDestructor(UA_Server       * server,
 	// in which case we set current child context to nullptr to continue pattern and return
 	UA_NodeId parentNodeId = QUaNode::getParentNodeId(*nodeId, server);
 	Q_ASSERT(!UA_NodeId_equal(&parentNodeId, &UA_NODEID_NULL));
-	void * parentContext;
+	void * parentContext = nullptr;
 	st = UA_Server_getNodeContext(server, parentNodeId, &parentContext);
 	Q_ASSERT(st == UA_STATUSCODE_GOOD);
 	auto parentNode = qobject_cast<QUaNode*>(static_cast<QObject*>(parentContext));
@@ -174,7 +178,10 @@ void QUaServer::uaDestructor(UA_Server       * server,
 	}
 	// if we reach here it means case 2), so deleteLater (when nodeId not in store anymore)
 	// so we avoid calling UA_Server_deleteNode in ~QUaNode
-	node->deleteLater();
+	if (context != nullptr) {
+		auto node = qobject_cast<QUaNode*>(static_cast<QObject*>(context));
+		node->deleteLater();
+	}
 	Q_UNUSED(st);
 	UA_NodeId_clear(&parentNodeId);
 }
