@@ -1,6 +1,5 @@
 #include "quaserver.h"
 
-#define QT_DEBUG
 /*********************************************************************************************
 Copied from open62541, to be able to implement:
 
