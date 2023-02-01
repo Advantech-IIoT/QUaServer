@@ -57,6 +57,9 @@ wrapper.sh
 app_version.h
 phony.c
 
+# qmake
+Makefile.qt
+
 # xemacs temporary files
 *.flc
 
