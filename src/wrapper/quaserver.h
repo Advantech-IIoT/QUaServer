@@ -3,8 +3,8 @@
 
 #include <type_traits>
 
-#include <QSequentialIterable>
 #include <QTimer>
+#include <QSequentialIterable>
 
 #include <QUaTypesConverter>
 #include <QUaFolderObject>

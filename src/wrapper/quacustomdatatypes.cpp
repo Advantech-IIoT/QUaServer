@@ -1354,63 +1354,87 @@ QUaLog::QUaLog(const QString& strMessage,
 
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 uint QUa::qHash(const Status &key, uint seed)
-#else
-size_t QUa::qHash(const Status &key, size_t seed)
-#endif
 {
     Q_UNUSED(seed);
     return static_cast<uint>(key);
 }
+#else
+size_t QUa::qHash(const Status &key, size_t seed)
+{
+    Q_UNUSED(seed);
+    return static_cast<size_t>(key);
+}
+#endif
 
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 uint QUa::qHash(const LogLevel &key, uint seed)
-#else
-size_t QUa::qHash(const LogLevel &key, size_t seed)
-#endif
 {
     Q_UNUSED(seed);
     return static_cast<uint>(key);
 }
+#else
+size_t QUa::qHash(const LogLevel &key, size_t seed)
+{
+    Q_UNUSED(seed);
+    return static_cast<size_t>(key);
+}
+#endif
 
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 uint QUa::qHash(const LogCategory &key, uint seed)
-#else
-size_t QUa::qHash(const LogCategory &key, size_t seed)
-#endif
 {
     Q_UNUSED(seed);
     return static_cast<uint>(key);
 }
+#else
+size_t QUa::qHash(const LogCategory &key, size_t seed)
+{
+    Q_UNUSED(seed);
+    return static_cast<size_t>(key);
+}
+#endif
 
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 uint QUa::qHash(const ExclusiveLimitState &key, uint seed)
-#else
-size_t QUa::qHash(const ExclusiveLimitState &key, size_t seed)
-#endif
 {
     Q_UNUSED(seed);
     return static_cast<uint>(key);
 }
+#else
+size_t QUa::qHash(const ExclusiveLimitState &key, size_t seed)
+{
+    Q_UNUSED(seed);
+    return static_cast<size_t>(key);
+}
+#endif
 
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 uint QUa::qHash(const ExclusiveLimitTransition &key, uint seed)
-#else
-size_t QUa::qHash(const ExclusiveLimitTransition &key, size_t seed)
-#endif
 {
     Q_UNUSED(seed);
     return static_cast<uint>(key);
 }
+#else
+size_t QUa::qHash(const ExclusiveLimitTransition &key, size_t seed)
+{
+    Q_UNUSED(seed);
+    return static_cast<size_t>(key);
+}
+#endif
 
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 uint QUa::qHash(const ChangeVerb &key, uint seed)
-#else
-size_t QUa::qHash(const ChangeVerb &key, size_t seed)
-#endif
 {
     Q_UNUSED(seed);
     return static_cast<uint>(key);
 }
+#else
+size_t QUa::qHash(const ChangeVerb &key, size_t seed)
+{
+    Q_UNUSED(seed);
+    return static_cast<size_t>(key);
+}
+#endif
 
 #ifdef UA_GENERATED_NAMESPACE_ZERO_FULL
 QUaOptionSet::QUaOptionSet() :
