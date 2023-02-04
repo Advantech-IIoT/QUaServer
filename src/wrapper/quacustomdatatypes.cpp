@@ -1488,7 +1488,7 @@ void QUaOptionSet::operator=(const QString& strXmlOptionSet)
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	auto components = QStringRef(&strXmlOptionSet).split(QLatin1String(";"));
 #else
-	auto components = QStringView(strXmlOptionSet).split(QChar(";"));
+	auto components = QStringView(strXmlOptionSet).split(QChar(';'));
 #endif
 	// check if valid xml format
 	if (components.size() != 2)
