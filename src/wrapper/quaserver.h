@@ -3,6 +3,7 @@
 
 #include <type_traits>
 
+#include <QSequentialIterable>
 #include <QTimer>
 
 #include <QUaTypesConverter>
