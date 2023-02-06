@@ -1186,11 +1186,7 @@ void QUaHistoryBackend::readEvent(
 					auto& name = i.key();
 					QVariant& value = i.value();
 					// NOTE : use ::value to avoid creating an unwanted entry into m_hashTypeVars
-#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
-					auto &type = fieldInfo.value(name, QMetaType::UnknownType); 
-#else
 					const auto &type = fieldInfo.value(name, QMetaType::UnknownType); 
-#endif
 					// NOTE : expensive, e.g. QString to QUaNodeId
 					QUaHistoryBackend::fixOutputVariantType(value, type); 
 					++i;
