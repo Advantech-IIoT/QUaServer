@@ -1523,10 +1523,19 @@ void QUaOptionSet::operator=(const QString& strXmlOptionSet)
 		return;
 	}
 	auto firstComp   = components.at(0);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	auto firstParts  = firstComp.split(QLatin1String("="));
+#else
+	auto firstParts  = firstComp.split(QChar('='));
+#endif
+
 	auto firstPart   = firstParts.count() > 1 ? firstParts.at(1) : firstParts.at(0);
 	auto secondComp  = components.at(1);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	auto secondParts = secondComp.split(QLatin1String("="));
+#else
+	auto secondParts = secondComp.split(QChar('='));
+#endif
 	auto secondPart  = secondParts.count() > 1 ? secondParts.at(1) : secondParts.at(0);
 	if (firstComp.contains(QString("valid")) && firstComp.contains(QString("bits")))
 	{
