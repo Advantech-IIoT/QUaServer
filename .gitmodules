@@ -1,3 +1,3 @@
 [submodule "depends/open62541.git"]
 	path = depends/open62541.git
-	url = https://github.com/open62541/open62541.git
+	url = https://github.com/Advantech-IIoT/open62541.git
