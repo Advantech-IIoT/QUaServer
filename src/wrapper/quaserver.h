@@ -68,7 +68,7 @@ class QUaServer : public QObject
 	Q_PROPERTY(QString    manufacturerName  READ manufacturerName  WRITE setManufacturerName  NOTIFY manufacturerNameChanged )
 	Q_PROPERTY(QString    softwareVersion   READ softwareVersion   WRITE setSoftwareVersion   NOTIFY softwareVersionChanged  )
 	Q_PROPERTY(QString    buildNumber       READ buildNumber       WRITE setBuildNumber       NOTIFY buildNumberChanged      )
-
+	Q_PROPERTY(QDateTime  buildDate         READ buildDate         WRITE setBuildDate         NOTIFY buildDateChanged        )
 	Q_PROPERTY(bool anonymousLoginAllowed READ anonymousLoginAllowed WRITE setAnonymousLoginAllowed NOTIFY buildNumberChanged)
 
 public:
@@ -106,6 +106,8 @@ public:
 	void    setSoftwareVersion(const QString &strSoftwareVersion);
 	QString buildNumber() const;
 	void    setBuildNumber(const QString &strBuildNumber);
+    	QDateTime buildDate() const;
+    	void    setBuildDate(const QDateTime &BuildDate);
 
 	// Server LifeCycle API
 
@@ -276,6 +278,7 @@ signals:
 	void manufacturerNameChanged     (const QString &strManufacturerName  );
 	void softwareVersionChanged      (const QString &strSoftwareVersion   );
 	void buildNumberChanged          (const QString &strBuildNumber       );
+	void buildDateChanged            (const QDateTime &BuildDate          );
 	void anonymousLoginAllowedChanged(const bool    &anonymousLoginAllowed);
 	
 	// Log API
@@ -315,6 +318,7 @@ private:
 	QByteArray m_byteManufacturerName;
 	QByteArray m_byteSoftwareVersion;
 	QByteArray m_byteBuildNumber; 
+	QDateTime m_byteBuildDate;
 
 	QHash<QString         , QString      > m_hashUsers;
 	QHash<UA_NodeId       , QUaSession*  > m_hashSessions;

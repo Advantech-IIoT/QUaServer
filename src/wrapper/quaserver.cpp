@@ -38,6 +38,7 @@
 
 #include <QMetaProperty>
 #include <QTimer>
+#include <QUaTypesConverter>
 
 #define QUA_MAX_LOG_MESSAGE_SIZE 1024
 
@@ -1218,6 +1219,8 @@ void QUaServer::resetConfig()
 	config->buildInfo.manufacturerName             = UA_String_fromChars(m_byteManufacturerName.data());
 	config->buildInfo.softwareVersion              = UA_String_fromChars(m_byteSoftwareVersion.data());
 	config->buildInfo.buildNumber                  = UA_String_fromChars(m_byteBuildNumber.data());
+	QUaTypesConverter::uaVariantFromQVariantScalar<UA_DateTime, QDateTime>(m_byteBuildDate,&config->buildInfo.buildDate);
+
 	// NOTE : update application description productUri as well
 	config->applicationDescription.productUri      = UA_String_fromChars(m_byteProductUri.data());
 	// update endpoints necessary
@@ -1411,11 +1414,13 @@ void QUaServer::setupServer()
 		(char*)config->buildInfo.softwareVersion.data,
 		(int)config->buildInfo.softwareVersion.length
 	);
-	// get server software version
+	// get server build Number
 	m_byteBuildNumber = QByteArray(
 		(char*)config->buildInfo.buildNumber.data,
 		(int)config->buildInfo.buildNumber.length
 	);
+	 // get server build Date	  
+	m_byteBuildDate = QUaTypesConverter::uaVariantToQVariantScalar<QDateTime, UA_DateTime>(&config->buildInfo.buildDate);
 
 	// copy other initial values
 	m_maxSecureChannels = config->maxSecureChannels;
@@ -1636,6 +1641,19 @@ void QUaServer::setBuildNumber(const QString& strBuildNumber)
 	// emit event
 	emit this->buildNumberChanged(strBuildNumber);
 }
+
+QDateTime QUaServer::buildDate() const
+{
+    return QDateTime(m_byteBuildDate);
+}
+
+void QUaServer::setBuildDate(const QDateTime& BuildDate)
+{                                   
+    m_byteBuildDate = BuildDate;        
+    emit this->buildDateChanged(BuildDate);
+}
+
+
 
 bool QUaServer::start()
 {
