@@ -26,6 +26,7 @@ class QUaRefreshRequiredEvent;
 #ifdef UA_ENABLE_HISTORIZING
 #include <QUaHistoryBackend>
 #endif // UA_ENABLE_HISTORIZING
+#define ENABLE_CURRENTTIME_WRITEABLE
 
 typedef std::function<QUaNodeId(const QUaNodeId&, const QUaQualifiedName&)> QUaChildNodeIdCallback;
 
@@ -196,7 +197,9 @@ public:
 	QUaNode * nodeById(const QUaNodeId& nodeId);
 	// check if a type with type name (C++ class name) is registered
 	bool isTypeNameRegistered(const QString &strTypeName) const;
-
+#ifdef ENABLE_CURRENTTIME_WRITEABLE
+	void enableCurrentTimeWriteable(bool value);
+#endif
 	// Browse API
 	// (* actually browses using QObject tree)
 
