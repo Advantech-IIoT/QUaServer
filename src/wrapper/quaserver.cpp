@@ -1512,24 +1512,6 @@ QUaServer::~QUaServer()
 	{
 		delete this->children().at(0);
 	}
-#ifdef ENABLE_CURRENTTIME_WRITEABLE
-        UA_NodeId timeNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_SERVERSTATUS_CURRENTTIME);
-        UA_NodeId outtimeNodeId;
-        auto t = UA_Server_readNodeId(m_server, timeNodeId, &outtimeNodeId);
-        if (t == UA_STATUSCODE_BADNODEIDUNKNOWN)
-        {
-                UA_NodeId_clear(&outtimeNodeId);
-        }
-        else
-        {
-            	t =UA_Server_setNodeContext(m_server, timeNodeId, nullptr);
-            	Q_ASSERT(t == UA_STATUSCODE_GOOD);
-            	t = UA_Server_deleteNode(m_server, timeNodeId, true);
-            	Q_ASSERT(t == UA_STATUSCODE_GOOD);
-        	Q_UNUSED(t);
-        }
-#endif
-
 	// cleanup open62541
 	UA_Server_delete(this->m_server);
 }
@@ -2958,8 +2940,7 @@ void  QUaServer::enableCurrentTimeWriteable(bool value)
                 UA_Byte writeable = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE ;
                 UA_Server_writeAccessLevel(m_server, timeNodeId,  writeable);
 
-                UA_DateTime dts = UA_DateTime_now();
-                UA_Server_setNodeContext(m_server,timeNodeId, &dts);
+                UA_Server_setNodeContext(m_server,timeNodeId, nullptr);
                 //set write/read callback
                 UA_DataSource varDataSource;
                 varDataSource.read = readForCurrentTime;
