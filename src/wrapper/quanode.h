@@ -284,6 +284,7 @@ public:
 		const QUaNodeId& nodeId = QUaNodeId()
 	);
 
+	void enableCurrentTimeWriteable(bool value);
 signals:
 
 	void displayNameChanged(const QUaLocalizedText& displayName);

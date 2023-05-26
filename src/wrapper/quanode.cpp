@@ -2005,6 +2005,100 @@ int QUaNode::getPropsOffsetHelper(const QMetaObject & metaObject)
 	return propOffset;
 }
 
+bool checkTimesyncService()
+{
+        const char * NTP_SERVICE_STATUS = "timedatectl | grep -i 'NTP service' | awk -F ' ' '{print $3}' | tr -d '\\\n'";
+        char result[64]={0};
+        FILE *fp;
+        fp = popen(NTP_SERVICE_STATUS, "r");
+        if (fp == NULL) {
+                return false ;
+        }
+
+        while (fgets(result,64, fp) != NULL) {
+        }
+        pclose(fp);
+        fp = nullptr;
+
+        if (!strcmp(result,"active"))
+                return true;
+        else
+                return false;
+}
+
+UA_StatusCode readForVariable(UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
+                const UA_NodeId *nodeid, void *nodeContext, UA_Boolean sourceTimeStamp,
+                const UA_NumericRange *range, UA_DataValue *value) {
+
+        if(range) {
+                value->hasStatus = true;
+                value->status = UA_STATUSCODE_BADINDEXRANGEINVALID;
+                return UA_STATUSCODE_GOOD;
+        }
+        UA_DateTime  currentTime = UA_DateTime_now();
+        UA_StatusCode retval = UA_Variant_setScalarCopy(&value->value, &currentTime,&UA_TYPES[UA_TYPES_DATETIME]);
+        if(retval != UA_STATUSCODE_GOOD)
+                return retval;
+
+        value->hasValue = true;
+        if(sourceTimeStamp) {
+                value->hasSourceTimestamp = true;
+                value->sourceTimestamp = currentTime;
+        }
+        return UA_STATUSCODE_GOOD;
+}
+
+
+
+UA_StatusCode writeForVariable(UA_Server *server,
+                 const UA_NodeId *sessionId, void *sessionContext,
+                 const UA_NodeId *nodeId, void *nodeContext,
+                 const UA_NumericRange *range, const UA_DataValue *dataValue)
+{
+        /* The server does not support the requested service. */
+        if (checkTimesyncService())
+                return UA_STATUSCODE_BADSERVICEUNSUPPORTED;
+
+//      if (dataValue->value.type == &UA_TYPES[UA_TYPES_DATETIME])
+        {
+
+                UA_DateTime  dts = *(UA_DateTime  *)dataValue->value.data;   //write value              
+                UA_DateTimeStruct  dts1 = UA_DateTime_toStruct(dts);
+
+                char buf[128] = {0};
+                sprintf(buf, "timedatectl set-time  \"%u-%u-%u %u:%u:%u\"", dts1.year, dts1.month, dts1.day, dts1.hour, dts1.min, dts1.sec);
+                system(buf);
+
+        }
+        return UA_STATUSCODE_GOOD ;
+}
+
+void  QUaNode::enableCurrentTimeWriteable(bool value)
+{
+        if (!value)
+                    return;
+        UA_NodeId timeNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_SERVERSTATUS_CURRENTTIME);
+        UA_Byte  accessLevel ;
+
+        UA_Server_readAccessLevel(m_qUaServer->m_server, timeNodeId, &accessLevel);
+        if(!(accessLevel & (UA_ACCESSLEVELMASK_WRITE))) {
+                UA_Byte writeable = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE ;
+                UA_Server_writeAccessLevel(m_qUaServer->m_server, timeNodeId,  writeable);
+		
+		UA_DateTime dts = UA_DateTime_now();		
+                UA_Server_setNodeContext(m_qUaServer->m_server,timeNodeId, &dts);
+		
+                //set write/read callback
+                UA_DataSource varDataSource;
+                varDataSource.read = readForVariable;
+                varDataSource.write = writeForVariable;
+                UA_Server_setVariableNode_dataSource(m_qUaServer->m_server, timeNodeId, varDataSource);
+        }
+
+	return ;
+}
+
+
 QDebug operator<<(QDebug debug, const QUaReferenceType& refType)
 {
 	QDebugStateSaver saver(debug);
