@@ -2877,6 +2877,7 @@ bool checkTimesyncService()
                 return true;
 }
 
+// copy from ua_server_ns0.c of opcua62541. line524
 UA_StatusCode readForCurrentTime(UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
                 const UA_NodeId *nodeid, void *nodeContext, UA_Boolean sourceTimeStamp,
                 const UA_NumericRange *range, UA_DataValue *value) {
@@ -2910,21 +2911,13 @@ UA_StatusCode writeForCurrentTime(UA_Server *server,
         if (!checkTimesyncService())
                 return UA_STATUSCODE_BADSERVICEUNSUPPORTED;
 
-        //UA_DateTime * contexvalue  = (UA_DateTime *)nodeContext;
-        //UA_DateTimeStruct conStru = UA_DateTime_toStruct(*contexvalue);
-        //printf("write context value: date is: %u-%u-%u %u:%u:%u.%03u\n",conStru.year, conStru.month, conStru.day, conStru.hour, conStru.min, conStru.sec, conStru.milliSec);
+		UA_DateTime  dts = *(UA_DateTime  *)dataValue->value.data;   //write value
+		UA_DateTimeStruct  dts1 = UA_DateTime_toStruct(dts);
 
-//      if (dataValue->value.type == &UA_TYPES[UA_TYPES_DATETIME])
-        {
+		char buf[128] = {0};
+		sprintf(buf, "timedatectl set-time  \"%u-%u-%u %u:%u:%u\"", dts1.year, dts1.month, dts1.day, dts1.hour, dts1.min, dts1.sec);
+		system(buf);
 
-                UA_DateTime  dts = *(UA_DateTime  *)dataValue->value.data;   //write value
-                UA_DateTimeStruct  dts1 = UA_DateTime_toStruct(dts);
-
-                char buf[128] = {0};
-                sprintf(buf, "timedatectl set-time  \"%u-%u-%u %u:%u:%u\"", dts1.year, dts1.month, dts1.day, dts1.hour, dts1.min, dts1.sec);
-                system(buf);
-
-        }
         return UA_STATUSCODE_GOOD ;
 }
 
@@ -2935,18 +2928,23 @@ void  QUaServer::enableCurrentTimeWriteable(bool value)
         UA_NodeId timeNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_SERVERSTATUS_CURRENTTIME);
         UA_Byte  accessLevel ;
 
-        UA_Server_readAccessLevel(m_server, timeNodeId, &accessLevel);
+        auto st = UA_Server_readAccessLevel(m_server, timeNodeId, &accessLevel);
+		Q_ASSERT(st == UA_STATUSCODE_GOOD);
+		Q_UNUSED(st);
         if(!(accessLevel & (UA_ACCESSLEVELMASK_WRITE))) {
                 UA_Byte writeable = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE ;
-                UA_Server_writeAccessLevel(m_server, timeNodeId,  writeable);
-
-                UA_Server_setNodeContext(m_server,timeNodeId, nullptr);
-                //set write/read callback
-                UA_DataSource varDataSource;
-                varDataSource.read = readForCurrentTime;
-                varDataSource.write = writeForCurrentTime;
-                UA_Server_setVariableNode_dataSource(m_server, timeNodeId, varDataSource);
+                st = UA_Server_writeAccessLevel(m_server, timeNodeId,  writeable);
+				Q_ASSERT(st == UA_STATUSCODE_GOOD);
+				Q_UNUSED(st);
         }
+
+		//set write/read callback
+		UA_DataSource varDataSource;
+		varDataSource.read = readForCurrentTime;
+		varDataSource.write = writeForCurrentTime;
+		st = UA_Server_setVariableNode_dataSource(m_server, timeNodeId, varDataSource);
+		Q_ASSERT(st == UA_STATUSCODE_GOOD);
+		Q_UNUSED(st);
 
         return ;
 }
