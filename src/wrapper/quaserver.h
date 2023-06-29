@@ -28,6 +28,8 @@ class QUaRefreshRequiredEvent;
 #endif // UA_ENABLE_HISTORIZING
 #define ENABLE_CURRENTTIME_WRITEABLE
 
+#define QUA_MAX_LOG_MESSAGE_SIZE 1024
+
 typedef std::function<QUaNodeId(const QUaNodeId&, const QUaQualifiedName&)> QUaChildNodeIdCallback;
 
 class QUaServer : public QObject
@@ -305,7 +307,7 @@ private:
 	QByteArray              m_byteCertificateInternal; // NOTE : needs to exists as long as server instance
 	bool                    m_anonymousLoginAllowed;
 	QUaFolderObject       * m_pobjectsFolder;
-	QByteArray              m_logBuffer;
+	char                    m_logBuffer[QUA_MAX_LOG_MESSAGE_SIZE];
     bool                    m_beingDestroyed;
 
 #ifdef UA_ENABLE_ENCRYPTION
