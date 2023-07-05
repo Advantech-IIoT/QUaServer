@@ -289,7 +289,8 @@ void QUaBaseVariable::setValue(
 #endif
 		{
 			auto iter = newValue.value<QSequentialIterable>();
-			QVariant innerVar = iter.at(0);
+			Q_ASSERT(iter.size() > 0); // The list must not be empty.
+			QVariant innerVar = (iter.size() > 0) ? iter.at(0) : QVariant();
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 			newType = static_cast<QMetaType::Type>( innerVar.type() );
 #else
@@ -319,7 +320,7 @@ void QUaBaseVariable::setValue(
 			{
 				// can convert to old type
 				auto iter = newValue.value<QSequentialIterable>();
-				QVariant innerVar = iter.at(0);
+				QVariant innerVar = (iter.size() > 0) ? iter.at(0) : QVariant();
 #if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 				if (innerVar.canConvert(oldType))
 #else
